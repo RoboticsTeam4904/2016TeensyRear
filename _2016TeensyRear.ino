@@ -2,10 +2,8 @@
 #include <FlexCAN.h>
 #include <TeensyCANBase.h>
 
-Encoder rightEncoder(5, 6);
-Encoder leftEncoder(7, 8);
-TeensyCANBase rightEncoderCAN(0x603, &rightEncoderFunc);
-TeensyCANBase leftEncoderCAN(0x602, &leftEncoderFunc);
+Encoder rightEncoder(8, 7);
+Encoder leftEncoder(5, 6);
 
 long lastReadRight = 0;
 long posRight = -999;
@@ -13,12 +11,6 @@ long rateRight = 0;
 long lastReadLeft = 0;
 long posLeft = -999;
 long rateLeft = 0;
-
-void setup(void) {
-  TeensyCANBase::begin();
-  delay(1000);
-  Serial.println("Teensy 3.X CAN Encoder");
-}
 
 int rightEncoderFunc(byte* msg, byte* resp) {
   if (msg[0] == 0) {
@@ -97,6 +89,16 @@ int leftEncoderFunc(byte* msg, byte* resp) {
   }
   return 1;                                                                                                                                                                                                                                   
 }
+
+TeensyCANBase rightEncoderCAN(0x603, &rightEncoderFunc);
+TeensyCANBase leftEncoderCAN(0x602, &leftEncoderFunc);
+
+void setup(void) {
+  TeensyCANBase::begin();
+  delay(1000);
+  Serial.println("Teensy 3.X CAN Encoder");
+}
+
 
 void loop(void) {
   TeensyCANBase::update();
