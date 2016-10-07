@@ -12,6 +12,9 @@ long lastReadLeft = 0;
 long posLeft = -999;
 long rateLeft = 0;
 
+const int ultrasonicPort = 0;
+long distance = 0;
+
 int rightEncoderFunc(byte* msg, byte* resp) {
   if (msg[0] == 0) {
     resp[0] = posRight & 0xff;
@@ -90,8 +93,26 @@ int leftEncoderFunc(byte* msg, byte* resp) {
   return 1;                                                                                                                                                                                                                                   
 }
 
+int ultrasonicFunc(byte* msg, byte* resp){
+  if(msg[0] == 0){
+    resp[0] = posLeft & 0xff;                                                                                                                                                                                                                 
+    resp[1] = (posLeft >> 8) & 0xff;                                                                                                                                                                                                          
+    resp[2] = (posLeft >> 16) & 0xff;                                                                                                                                                                                                         
+    resp[3] = (posLeft >> 24) & 0xff;
+
+    for(int i = 4; i < 8; i++){
+      resp[i] = 0;
+    }
+
+    return 0;
+  }
+
+  return 1;
+}
+
 TeensyCANBase rightEncoderCAN(0x603, &rightEncoderFunc);
 TeensyCANBase leftEncoderCAN(0x602, &leftEncoderFunc);
+TeensyCANBase ultrasonicCAN(0x604, &ultrasonicFunc);
 
 void setup(void) {
   TeensyCANBase::begin();
@@ -130,5 +151,7 @@ void loop(void) {
       rateLeft = 0;
     }
   }
+
+  distance = pulseIn(ultrasonicPort, HIGH) / 58; // Pulse is 58us per cm
 }
 
