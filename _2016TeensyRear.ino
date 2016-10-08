@@ -13,7 +13,7 @@ long posLeft = -999;
 long rateLeft = 0;
 
 const int ultrasonicPort = 0;
-long distance = 0;
+int distance = 0;
 
 int rightEncoderFunc(byte* msg, byte* resp) {
   if (msg[0] == 0) {
@@ -95,10 +95,10 @@ int leftEncoderFunc(byte* msg, byte* resp) {
 
 int ultrasonicFunc(byte* msg, byte* resp){
   if(msg[0] == 0){
-    resp[0] = posLeft & 0xff;                                                                                                                                                                                                                 
-    resp[1] = (posLeft >> 8) & 0xff;                                                                                                                                                                                                          
-    resp[2] = (posLeft >> 16) & 0xff;                                                                                                                                                                                                         
-    resp[3] = (posLeft >> 24) & 0xff;
+    resp[0] = distance & 0xff;                                                                                                                                                                                                                 
+    resp[1] = (distance >> 8) & 0xff;                                                                                                                                                                                                          
+    resp[2] = (distance >> 16) & 0xff;                                                                                                                                                                                                         
+    resp[3] = (distance >> 24) & 0xff;
 
     for(int i = 4; i < 8; i++){
       resp[i] = 0;
@@ -154,14 +154,17 @@ void loop(void) {
   }
 
   if(Serial1.available()){
-    distance = 0;
+    int newDistance = 0;
     if(Serial1.read() == 82){
       delay(5);
-      distance += (Serial1.read() - 48) * 100;
+      newDistance += (Serial1.read() - 48) * 100;
       delay(5);
-      distance += (Serial1.read() - 48) * 10;
+      newDistance += (Serial1.read() - 48) * 10;
       delay(5);
-      distance += (Serial1.read() - 48);
+      newDistance += (Serial1.read() - 48);
+    }
+    if(newDistance != 0){
+      distance = newDistance;
     }
     Serial.println(distance);
   }
