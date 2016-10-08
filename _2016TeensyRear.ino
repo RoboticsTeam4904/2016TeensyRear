@@ -116,6 +116,7 @@ TeensyCANBase ultrasonicCAN(0x604, &ultrasonicFunc);
 
 void setup(void) {
   TeensyCANBase::begin();
+  Serial1.begin(9600, SERIAL_8N1_RXINV);
   delay(1000);
   Serial.println("Teensy 3.X CAN Encoder");
 }
@@ -152,6 +153,17 @@ void loop(void) {
     }
   }
 
-  distance = pulseIn(ultrasonicPort, HIGH) / 58; // Pulse is 58us per cm
+  if(Serial1.available()){
+    distance = 0;
+    if(Serial1.read() == 82){
+      delay(5);
+      distance += (Serial1.read() - 48) * 100;
+      delay(5);
+      distance += (Serial1.read() - 48) * 10;
+      delay(5);
+      distance += (Serial1.read() - 48);
+    }
+    Serial.println(distance);
+  }
 }
 
