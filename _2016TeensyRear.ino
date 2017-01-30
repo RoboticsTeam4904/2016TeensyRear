@@ -66,9 +66,10 @@ void setup(void) {
 
 void loop(void) {
   CAN_update();
-  byte* msg = new int(8);
+  byte* msg = new byte[8];
 
   long newPos = rightEncoder.read();
+  Serial.println(newPos);
   if (newPos != posRight) {
     rateRight = ((double) 1000000.0 * (newPos - posRight)) / ((double) (micros() - lastReadRight));
     posRight = newPos;
@@ -109,13 +110,15 @@ void loop(void) {
     msg[4] = rateLeft & 0xff;                                                                                                                                                                                                                
     msg[5] = (rateLeft >> 8) & 0xff;                                                                                                                                                                                                         
     msg[6] = (rateLeft >> 16) & 0xff;                                                                                                                                                                                                        
-    msg[7] = (rateLeft >> 24) & 0xff;    
-    CAN_write(0x603, msg); 
+    msg[7] = (rateLeft >> 24) & 0xff;     
   }
   else {
     if ((micros() - lastReadLeft) > 1000) {
       rateLeft = 0;
     }
   }
+  CAN_write(0x603, msg);
+  delete msg;
+  delay(5);
 }
 
