@@ -50,7 +50,7 @@ void leftEncoderFunc(byte* msg) {
     leftEncoder.write(0);                                                                                                                                                                                                                     
     posLeft = 0;                                                                                                                                                                                                                              
     rateLeft = 0;                                                                                                                                                                                                                             
-    Serial.println("reset");                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+    Serial.println("reset.");                                                                                                                                                                                                                                                                                                                                                                                                                                                 
   }                                                                                                                                                                                                                                
 }
 
@@ -66,6 +66,7 @@ void setup(void) {
 
 void loop(void) {
   CAN_update();
+  byte* msg = new int(8);
 
   long newPos = rightEncoder.read();
   if (newPos != posRight) {
@@ -74,6 +75,17 @@ void loop(void) {
     Serial.print("Right: ");
     Serial.println(posRight);
     lastReadRight = micros();
+    
+    msg[0] = posRight & 0xff;
+    msg[1] = (posRight >> 8) & 0xff;
+    msg[2] = (posRight >> 16) & 0xff;
+    msg[3] = (posRight >> 24) & 0xff;
+
+    msg[4] = rateRight & 0xff;
+    msg[5] = (rateRight >> 8) & 0xff;
+    msg[6] = (rateRight >> 16) & 0xff;
+    msg[7] = (rateRight >> 24) & 0xff;
+    CAN_write(0x602, msg);   
   }
   else {
     if ((micros() - lastReadRight) > 1000) {
@@ -88,6 +100,17 @@ void loop(void) {
     Serial.print("Left: ");
     Serial.println(posLeft);
     lastReadLeft = micros();
+    
+    msg[0] = posLeft & 0xff;                                                                                                                                                                                                                 
+    msg[1] = (posLeft >> 8) & 0xff;                                                                                                                                                                                                          
+    msg[2] = (posLeft >> 16) & 0xff;                                                                                                                                                                                                         
+    msg[3] = (posLeft >> 24) & 0xff;                                                                                                                                                                                                         
+
+    msg[4] = rateLeft & 0xff;                                                                                                                                                                                                                
+    msg[5] = (rateLeft >> 8) & 0xff;                                                                                                                                                                                                         
+    msg[6] = (rateLeft >> 16) & 0xff;                                                                                                                                                                                                        
+    msg[7] = (rateLeft >> 24) & 0xff;    
+    CAN_write(0x603, msg); 
   }
   else {
     if ((micros() - lastReadLeft) > 1000) {
